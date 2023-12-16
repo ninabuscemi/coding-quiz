@@ -1,4 +1,4 @@
-# 03 JavaScript: Password Generator
+# 04 Web APIs Challenge: Code Quiz
 
 ## Description
 In this module, we learned about building web APIs and how to create a code quiz application. The Code Quiz app is a timed quiz with multiple-choice questions. It runs in the browser and features dynamically updated HTML and CSS powered by JavaScript code. The app has a clean, polished, and responsive user interface.
