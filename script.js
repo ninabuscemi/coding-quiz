@@ -46,15 +46,32 @@ function startQuiz() {
 
 var questions = [
   {
-    question: "Question 1",
-    choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+    question: "Question 1: Which HTML tag is used to define an unordered list?",
+    choices: ["<ul>", "<ol>", "<li>", "<div>"],
+    answer: 1
+  },
+  {
+    question: "Question 2: Which CSS property is used to change the color of text?",
+    choices: ["font-size", "background-color", "color", "text-align"],
+    answer: 3
+  },
+  {
+    question: "Question 3: What is the correct syntax for creating a JavaScript function?",
+    choices: ["function = myFunction() { }", "function myFunction() { }", "myFunction() = function { }", "myFunction() { }"],
     answer: 2
   },
   {
-    question: "Question 2",
-    choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+    question: "Question 4: Which JavaScript method is used to add an element to the end of an array?",
+    choices: ["push()", "pop()", "shift()", "unshift()"],
     answer: 1
   },
+  {
+    question: "Question 5: Which CSS property is used to change the color of text?",
+    choices: ["DOM API", "Fetch API", "Storage API", "Animation API"],
+    answer: 2
+  },
+
+  
   // Add more questions here
 ];
 
