@@ -1,8 +1,11 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f2f2f2;
+  background-color: #f4f4f4;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
 }
 
 header {
@@ -35,6 +38,7 @@ header {
 .question-container {
   display: none;
   margin-bottom: 20px;
+  text-align: left;
 }
 
 .question {
@@ -103,10 +107,37 @@ header {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  position: relative;
+  text-align: center;
 }
 
-.high-scores-btn {
+#highscore-container {
+  display: none;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#highscore-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#highscore-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#highscore-list li {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+#high-scores-btn {
   padding: 10px 20px;
   background-color: #007bff;
   color: #fff;
@@ -114,22 +145,68 @@ header {
   cursor: pointer;
 }
 
-.high-scores-btn:hover {
+#high-scores-btn:hover {
   background-color: #0056b3;
+}
+
+#highscore-form {
+  margin-top: 10px;
+}
+
+#view-scores-button {
+  display: none;
+}
+
+#initials-input {
+  padding: 5px;
+  margin-right: 5px;
+}
+
+#submit-button {
+  padding: 5px 10px;
 }
 
 .timer {
   font-size: 20px;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
+#quiz-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   text-align: center;
+  display: none;
 }
 
-.question-container {
-  margin-bottom: 20px;
-  text-align: left;
+#highscore-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  display: none;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#highscore-list {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
 }

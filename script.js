@@ -1,20 +1,12 @@
 var startButton = document.getElementById("start-btn");
-
 startButton.addEventListener("click", startQuiz);
-
-function startQuiz() {
-  startButton.style.display = "none";
-  showQuestion();
-  questionContainer.style.display = "block";
-  startTimer();
-}
 
 var timerElement = document.getElementById("timer");
 var timerInterval;
 var timeLeft;
 
 function startTimer() {
-  timeLeft = 75; // Set the desired time in seconds
+  timeLeft = 75;
   timerInterval = setInterval(function() {
     timeLeft--;
     timerElement.textContent = "Time: " + timeLeft + "s";
@@ -32,17 +24,9 @@ function stopTimer() {
 
 function showScore() {
   stopTimer();
-  // Rest of the code to show the score
 }
 
 // Modify the startQuiz() function as follows
-
-function startQuiz() {
-  startButton.style.display = "none";
-  showQuestion();
-  questionContainer.style.display = "block";
-  startTimer();
-}
 
 var questions = [
   {
@@ -70,9 +54,6 @@ var questions = [
     choices: ["DOM API", "Fetch API", "Storage API", "Animation API"],
     answer: 2
   },
-
-  
-  // Add more questions here
 ];
 
 var currentQuestionIndex = 0;
@@ -131,17 +112,159 @@ function showScore() {
   scoreElement.textContent = "Your score: " + score + "/" + questions.length;
   scoreContainer.style.display = "block";
 }
+var viewHighScoresButton = document.getElementById("high-scores-btn");
+var highscoreContainer = document.getElementById("highscore-container");
+
+var quizActive = false; // Variable to track if the quiz is active
+
+// Function to start the quiz
+function startQuiz() {
+  quizActive = true; // Set the quiz as active
+  startButton.style.display = "none";
+  showQuestion();
+  questionContainer.style.display = "block";
+  startTimer();
+}
+
+function showHighScores() {
+  if (!quizActive) { // Only allow clicking on the button if the quiz is not active
+    // Hide the quiz elements
+    questionContainer.style.display = "none";
+    resultContainer.style.display = "none";
+    scoreContainer.style.display = "none";
+
+    // Show the high scores container
+    highscoreContainer.style.display = "block";
+
+    // Retrieve and display the high scores
+    displayHighScores();
+  }
+}
+
+// Function to hide the high scores container
+function hideHighScores() {
+  if (!quizActive) { // Only allow clicking on the button if the quiz is not active
+    // Show the quiz elements
+    questionContainer.style.display = "block";
+    resultContainer.style.display = "block";
+    scoreContainer.style.display = "block";
+
+    // Hide the high scores container
+    highscoreContainer.style.display = "none";
+  }
+}
+
+// Adjusted event listener for the high scores button
+viewHighScoresButton.addEventListener("click", function() {
+  if (!quizActive) { // Only allow clicking on the button if the quiz is not active
+    if (highscoreContainer.style.display === "none") {
+      showHighScores();
+    } else {
+      hideHighScores();
+    }
+  }
+});
+
+var submitButton = document.getElementById("submit-button");
+var initialsInput = document.getElementById("initials-input");
+
+submitButton.addEventListener("click", function(event) {
+  event.preventDefault();
+
+  var initials = initialsInput.value;
+  var scoreData = {
+    initials: initials,
+    score: score
+  };
+
+  // Retrieve existing high scores from localStorage
+  var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
+
+  // Add the current score to the high scores array
+  highscores.push(scoreData);
+
+  // Save the updated high scores back to localStorage
+  localStorage.setItem("highscores", JSON.stringify(highscores));
+
+  // Display the updated high scores
+  displayHighScores();
+});
+
+function displayHighScores() {
+  var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
+  var highscoreList = document.getElementById("highscore-list");
+
+  // Clear the existing high score list
+  highscoreList.innerHTML = "";
+
+  // Sort high scores in descending order
+  highscores.sort(function (a, b) {
+    return b.score - a.score;
+  });
+
+  // Iterate over the high scores and create list items for each score
+  highscores.forEach(function (highscore, index) {
+    var li = document.createElement("li");
+    li.textContent = highscore.initials + ": " + highscore.score;
+
+    // Add a remove button for each high score
+    var removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", function () {
+      removeHighScore(index);
+    });
+
+    li.appendChild(removeButton);
+    highscoreList.appendChild(li);
+  });
+
+  function removeHighScore(index) {
+    // Retrieve existing high scores from localStorage
+    var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
+  
+    // Check if the index is valid
+    if (index >= 0 && index < highscores.length) {
+      // Remove the high score at the specified index
+      highscores.splice(index, 1);
+  
+      // Save the updated high scores back to localStorage
+      localStorage.setItem("highscores", JSON.stringify(highscores));
+  
+      // Display the updated high scores
+      displayHighScores();
+    }
+  }
+
+  // Clear the initials input field
+  initialsInput.value = "";
+}
+
+function showScore() {
+  stopTimer();
+  scoreElement.textContent = "Your score: " + score + "/" + questions.length;
+  scoreContainer.style.display = "block";
+  highscoreContainer.style.display = "block";
+}
+
+restartButton.addEventListener("click", restartQuiz);
 
 function restartQuiz() {
+  quizActive = false; // Set the quiz as inactive
   currentQuestionIndex = 0;
   score = 0;
-  showQuestion();
+
+  // Check if the quiz is active before showing the question
+  if (quizActive) {
+    showQuestion();
+  }
+
   questionContainer.style.display = "block";
   resultContainer.style.display = "none";
   scoreContainer.style.display = "none";
+  highscoreContainer.style.display = "none";
 }
 
-nextButton.addEventListener("click", showNextQuestion);
 restartButton.addEventListener("click", restartQuiz);
+nextButton.addEventListener("click", showNextQuestion);
 
 showQuestion();
