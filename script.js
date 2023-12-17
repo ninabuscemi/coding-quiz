@@ -1,32 +1,5 @@
-var startButton = document.getElementById("start-btn");
-startButton.addEventListener("click", startQuiz);
-
-var timerElement = document.getElementById("timer");
-var timerInterval;
-var timeLeft;
-
-function startTimer() {
-  timeLeft = 75;
-  timerInterval = setInterval(function() {
-    timeLeft--;
-    timerElement.textContent = "Time: " + timeLeft + "s";
-
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      showScore();
-    }
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
-function showScore() {
-  stopTimer();
-}
-
 // Modify the startQuiz() function as follows
+document.addEventListener("DOMContentLoaded", function () {
 
 var questions = [
   {
@@ -57,49 +30,109 @@ var questions = [
 ];
 
 var currentQuestionIndex = 0;
-var score = 0;
+  var score = 0;
 
-var questionContainer = document.getElementById("question-container");
-var questionElement = document.getElementById("question");
-var choicesElement = document.getElementById("choices");
-var resultContainer = document.getElementById("result-container");
-var resultElement = document.getElementById("result");
-var nextButton = document.getElementById("next-btn");
-var scoreContainer = document.getElementById("score-container");
-var scoreElement = document.getElementById("score");
-var restartButton = document.getElementById("restart-btn");
+  var questionElement = document.getElementById("question");
+  var choicesElement = document.getElementById("choices");
+  var resultContainer = document.getElementById("result-container");
+  var resultElement = document.getElementById("result");
+  var nextButton = document.getElementById("next-btn");
+  var scoreContainer = document.getElementById("score-container");
+  var scoreElement = document.getElementById("score");
+  var restartButton = document.getElementById("restart-btn");
+  var feedbackElement = document.getElementById("feedback");
+  var questionContainer = document.getElementById("question-container");
 
-function showQuestion() {
-  var currentQuestion = questions[currentQuestionIndex];
-  questionElement.textContent = currentQuestion.question;
+  function showQuestion() {
+    var currentQuestion = questions[currentQuestionIndex];
 
-  choicesElement.innerHTML = "";
-  currentQuestion.choices.forEach(function(choice, index) {
-    var li = document.createElement("li");
-    li.textContent = choice;
-    li.addEventListener("click", function() {
-      checkAnswer(index);
+    console.log("currentQuestion:", currentQuestion);
+    console.log("questionElement:", questionElement);
+    console.log("choicesElement:", choicesElement);
+    console.log("feedbackElement:", feedbackElement);
+
+    if (!currentQuestion || !questionElement || !choicesElement || !feedbackElement) {
+      console.error("Error: Could not find one or more necessary elements.");
+      return;
+    }
+
+    // Update question text
+    questionElement.textContent = currentQuestion.question;
+
+    // Clear previous choices
+    choicesElement.innerHTML = "";
+
+    // Update choices
+    currentQuestion.choices.forEach(function (choice, index) {
+      var li = document.createElement("li");
+      li.textContent = choice;
+      li.addEventListener("click", function () {
+        checkAnswer(index);
+      });
+      choicesElement.appendChild(li);
     });
-    choicesElement.appendChild(li);
-  });
+
+    // Show the question container
+    questionContainer.style.display = "block";
+  }
+
+var startButton = document.getElementById("start-btn");
+startButton.addEventListener("click", startQuiz);
+
+var timerElement = document.getElementById("timer");
+var timerInterval;
+var timeLeft;
+
+function startTimer() {
+  timeLeft = 75;
+  timerInterval = setInterval(function() {
+    timeLeft--;
+    timerElement.textContent = "Time: " + timeLeft + "s";
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      showScore();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function showScore() {
+  stopTimer();
 }
 
 function checkAnswer(choiceIndex) {
   var currentQuestion = questions[currentQuestionIndex];
   if (choiceIndex === currentQuestion.answer) {
+    feedbackElement.textContent = "Correct!";
     score++;
-    resultElement.textContent = "Correct!";
   } else {
-    resultElement.textContent = "Incorrect!";
+    feedbackElement.textContent = "Incorrect!";
   }
 
   questionContainer.style.display = "none";
   resultContainer.style.display = "block";
 }
 
+function applyAnswerStyles(li, choiceIndex) {
+  var currentQuestion = questions[currentQuestionIndex];
+
+  // Remove existing styles
+  li.classList.remove("correct-answer", "incorrect-answer");
+
+  if (choiceIndex === currentQuestion.answer) {
+    li.classList.add("correct-answer");
+  } else {
+    li.classList.add("incorrect-answer");
+  }
+}
+
 function showNextQuestion() {
-  currentQuestionIndex++;
-  if (currentQuestionIndex < questions.length) {
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
     showQuestion();
     questionContainer.style.display = "block";
     resultContainer.style.display = "none";
@@ -116,14 +149,29 @@ var viewHighScoresButton = document.getElementById("high-scores-btn");
 var highscoreContainer = document.getElementById("highscore-container");
 
 var quizActive = false; // Variable to track if the quiz is active
+var questionContainer = document.getElementById("question-container");
 
 // Function to start the quiz
 function startQuiz() {
   quizActive = true; // Set the quiz as active
+
+  // Hide the high scores container
+  highscoreContainer.style.display = "none";
+
+  // Declare questionContainer here
+  var questionContainer = document.getElementById("question-container");
+
+  // Hide the start button
+  var startButton = document.getElementById("start-btn");
+  console.log("startButton:", startButton);
+
+  if (!startButton) {
+    console.error("Error: Could not find the 'start-btn' element.");
+    return;
+  }
+
   startButton.style.display = "none";
-  showQuestion();
-  questionContainer.style.display = "block";
-  startTimer();
+
 }
 
 function showHighScores() {
@@ -135,6 +183,7 @@ function showHighScores() {
 
     // Show the high scores container
     highscoreContainer.style.display = "block";
+    highscoreContainer.classList.add("show");
 
     // Retrieve and display the high scores
     displayHighScores();
@@ -143,21 +192,32 @@ function showHighScores() {
 
 // Function to hide the high scores container
 function hideHighScores() {
-  if (!quizActive) { // Only allow clicking on the button if the quiz is not active
-    // Show the quiz elements
-    questionContainer.style.display = "block";
-    resultContainer.style.display = "block";
-    scoreContainer.style.display = "block";
+  if (!quizActive) {
+    console.log("Hiding high scores");
+    highscoreContainer.addEventListener("transitionend", function onTransitionEnd() {
+      console.log("Transition ended");
+      // Remove the event listener to prevent multiple calls
+      highscoreContainer.removeEventListener("transitionend", onTransitionEnd);
+      
+      // Show the quiz elements
+      if (!quizActive) {
+        console.log("Displaying quiz elements");
+        questionContainer.style.display = "block";
+        resultContainer.style.display = "block";
+        scoreContainer.style.display = "block";
+      }
+    });
 
     // Hide the high scores container
     highscoreContainer.style.display = "none";
+    highscoreContainer.classList.remove("show");
   }
 }
 
 // Adjusted event listener for the high scores button
-viewHighScoresButton.addEventListener("click", function() {
-  if (!quizActive) { // Only allow clicking on the button if the quiz is not active
-    if (highscoreContainer.style.display === "none") {
+viewHighScoresButton.addEventListener("click", function () {
+  if (!quizActive) {
+    if (!highscoreContainer.classList.contains("show")) {
       showHighScores();
     } else {
       hideHighScores();
@@ -246,18 +306,17 @@ function showScore() {
   highscoreContainer.style.display = "block";
 }
 
-restartButton.addEventListener("click", restartQuiz);
-
 function restartQuiz() {
   quizActive = false; // Set the quiz as inactive
   currentQuestionIndex = 0;
   score = 0;
+  showQuestion(); // Show the first question
+  startTimer(); // Restart the timer
 
-  // Check if the quiz is active before showing the question
-  if (quizActive) {
-    showQuestion();
-  }
+  // Clear previous feedback
+  feedbackElement.textContent = "";
 
+  // Display or hide the appropriate containers
   questionContainer.style.display = "block";
   resultContainer.style.display = "none";
   scoreContainer.style.display = "none";
@@ -268,3 +327,5 @@ restartButton.addEventListener("click", restartQuiz);
 nextButton.addEventListener("click", showNextQuestion);
 
 showQuestion();
+
+});
