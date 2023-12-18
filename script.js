@@ -1,15 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
-
   var questions = [
     {
       question: "Question 1: Which HTML tag is used to define an unordered list?",
       choices: ["<ul>", "<ol>", "<li>", "<div>"],
-      answer: 1
+      answer: 1,
     },
     {
       question: "Question 2: Which CSS property is used to change the color of text?",
       choices: ["font-size", "background-color", "color", "text-align"],
-      answer: 3
+      answer: 3,
     },
     {
       question: "Question 3: What is the correct syntax for creating a JavaScript function?",
@@ -17,57 +16,133 @@ document.addEventListener("DOMContentLoaded", function () {
         "function = myFunction() { }",
         "function myFunction() { }",
         "myFunction() = function { }",
-        "myFunction() { }"
+        "myFunction() { }",
       ],
-      answer: 2
+      answer: 2,
     },
     {
       question: "Question 4: Which JavaScript method is used to add an element to the end of an array?",
       choices: ["push()", "pop()", "shift()", "unshift()"],
-      answer: 1
+      answer: 1,
     },
     {
       question: "Question 5: Which CSS property is used to change the color of text?",
       choices: ["DOM API", "Fetch API", "Storage API", "Animation API"],
-      answer: 2
-    }
+      answer: 2,
+    },
   ];
 
   var currentQuestionIndex = 0;
   var score = 0;
   var timeLeft;
+  var answerSelected = false;
+  var quizActive = false;
 
   var questionElement = document.getElementById("question");
   var choicesElement = document.getElementById("choices");
   var resultContainer = document.getElementById("result-container");
-  var showNextButton = document.getElementById("next-btn");
   var scoreElement = document.getElementById("score");
-  var restartButton = document.getElementById("restart-btn");
   var feedbackElement = document.getElementById("feedback");
   var questionContainer = document.getElementById("question-container");
-  var isNextButtonListenerAdded = false;
+  var highscoreContainer = document.getElementById("highscore-container");
+  var nextButtonClickable = true; // Move this line outside the DOMContentLoaded event listener
+  var quizActive = false;
+
+  var nextButton = document.createElement("button");
+  nextButton.textContent = "Next";
+  nextButton.id = "next-btn";
+  nextButton.className = "next-btn";
+  nextButton.style.display = "none";
+  questionContainer.appendChild(nextButton);
+
+  function hideResultContainer() {
+    resultContainer.style.display = "none";
+  }
 
   function showQuestion() {
     var currentQuestion = questions[currentQuestionIndex];
+    answerSelected = false;
 
     if (!currentQuestion || !questionElement || !choicesElement || !feedbackElement) {
       console.error("Error: Could not find one or more necessary elements.");
       return;
     }
 
-    questionElement.textContent = currentQuestion.question;
     choicesElement.innerHTML = "";
+    questionElement.textContent = currentQuestion.question;
 
     currentQuestion.choices.forEach(function (choice, index) {
       var li = document.createElement("li");
       li.textContent = choice;
-      li.addEventListener("click", function () {
-        checkAnswer(index);
-      });
+
+      var onClick = function () {
+        if (!answerSelected) {
+          answerSelected = true;
+          checkAnswer(index);
+          showNextButton();
+        }
+      };
+
+      li.addEventListener("click", onClick);
       choicesElement.appendChild(li);
     });
 
     questionContainer.style.display = "block";
+  }
+
+  function checkAnswer(choiceIndex) {
+    if (!answerSelected) {
+      answerSelected = true;
+      var currentQuestion = questions[currentQuestionIndex];
+      if (choiceIndex === currentQuestion.answer) {
+        feedbackElement.textContent = "Correct!";
+        score++;
+      } else {
+        feedbackElement.textContent = "Incorrect!";
+        timeLeft -= 10;
+      }
+      feedbackElement.style.display = "block";
+      setTimeout(function () {
+        hideResultContainer();
+        showNextQuestion();
+      }, 1000);
+    }
+  }
+
+  function showNextButton() {
+    nextButton.style.display = "block";
+    if (nextButtonClickable) {
+      nextButton.addEventListener("click", onNextButtonClick);
+    }
+  }
+
+  function showNextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      showQuestion();
+    } else {
+      showScore();
+    }
+  }
+  
+  function showScore() {
+    stopTimer();
+    scoreElement.textContent = "Your score: " + score + "/" + questions.length;
+    resultContainer.style.display = "block";
+    displayHighScores();
+  }
+
+  function onNextButtonClick() {
+    nextButton.style.display = "none";
+    feedbackElement.style.display = "none";
+    nextButtonClickable = false;
+    showNextQuestion();
+  }
+
+  function hideNextButton() {
+    nextButton.style.display = "none";
+    nextButtonClickable = true;
+    nextButton.removeEventListener("click", onNextButtonClick);
   }
 
   var startButton = document.getElementById("start-btn");
@@ -97,88 +172,11 @@ document.addEventListener("DOMContentLoaded", function () {
     stopTimer();
     scoreElement.textContent = "Your score: " + score + "/" + questions.length;
     resultContainer.style.display = "block";
-  }
-
-  function checkAnswer(choiceIndex) {
-    var currentQuestion = questions[currentQuestionIndex];
-    if (choiceIndex === currentQuestion.answer) {
-      feedbackElement.textContent = "Correct!";
-      score++;
-    } else {
-      feedbackElement.textContent = "Incorrect!";
-      timeLeft -= 10; // Deduct 10 seconds for an incorrect answer
-  }
-}
-var showNextButton = document.createElement("button");
-showNextButton.textContent = "Next";
-showNextButton.id = "next-btn";
-showNextButton.className = "next-btn";
-showNextButton.style.display = "none";
-
-questionContainer.appendChild(showNextButton);
-
-function showNextButton() {
-  showNextButton.style.display = "block";
-  if (!isNextButtonListenerAdded) {
-    showNextButton.addEventListener("click", showNextQuestion);
-    isNextButtonListenerAdded = true;
-  }
-}
-
-  function hideQuestionContainer() {
-    questionContainer.style.display = "none";
-  }
-
-  function showNextQuestion() {
-    hideResultContainer(); // Hide the result container
-
-    if (currentQuestionIndex < questions.length - 1) {
-      currentQuestionIndex++;
-      showQuestion();
-      hideNextButton(); // Hide the next button when showing the next question
-    } else {
-      showScore();
-    }
-  }
-
-  function hideResultContainer() {
-    resultContainer.style.display = "none";
-  }
-
-  function hideNextButton() {
-    nextButton.style.display = "none";
-    isNextButtonListenerAdded = false; // Reset the flag
+    displayHighScores();
   }
 
   var restartButton = document.getElementById("restart-btn");
   restartButton.addEventListener("click", restartQuiz);
-
-  var viewHighScoresButton = document.getElementById("high-scores-btn");
-  var highscoreContainer = document.getElementById("highscore-container");
-
-  var quizActive = false;
-  var questionContainer = document.getElementById("question-container");
-
-  function startQuiz() {
-    quizActive = true;
-    highscoreContainer.style.display = "none";
-    var questionContainer = document.getElementById("question-container");
-    var startButton = document.getElementById("start-btn");
-    startButton.style.display = "none";
-    startTimer();
-    showQuestion();
-  }
-
-  function restartQuiz() {
-    quizActive = false;
-    currentQuestionIndex = 0;
-    score = 0;
-    showQuestion();
-    startTimer();
-    feedbackElement.textContent = "";
-    resultContainer.style.display = "none";
-    highscoreContainer.style.display = "none";
-  }
 
   var submitButton = document.getElementById("submit-button");
   var initialsInput = document.getElementById("initials-input");
@@ -188,7 +186,7 @@ function showNextButton() {
     var initials = initialsInput.value;
     var scoreData = {
       initials: initials,
-      score: score
+      score: score,
     };
 
     var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
@@ -245,6 +243,26 @@ function showNextButton() {
     }
   });
 
+  function startQuiz() {
+    quizActive = true;
+    highscoreContainer.style.display = "none";
+    var startButton = document.getElementById("start-btn");
+    startButton.style.display = "none";
+    startTimer();
+    showQuestion();
+  }
+
+  function restartQuiz() {
+    quizActive = false;
+    currentQuestionIndex = 0;
+    score = 0;
+    showQuestion();
+    startTimer();
+    feedbackElement.textContent = "";
+    resultContainer.style.display = "none";
+    highscoreContainer.style.display = "none";
+  }
+
   function showHighScores() {
     if (!quizActive) {
       questionContainer.style.display = "none";
@@ -253,23 +271,21 @@ function showNextButton() {
       highscoreContainer.style.display = "block";
       highscoreContainer.classList.add("show");
       displayHighScores();
+      highscoreContainer.addEventListener("transitionend", hideOtherContainers);
     }
   }
 
   function hideHighScores() {
     if (!quizActive) {
-      highscoreContainer.addEventListener("transitionend", function onTransitionEnd() {
-        highscoreContainer.removeEventListener("transitionend", onTransitionEnd);
-        if (!quizActive) {
-          questionContainer.style.display = "block";
-          resultContainer.style.display = "block";
-          scoreElement.style.display = "block";
-        }
-      });
-
       highscoreContainer.style.display = "none";
       highscoreContainer.classList.remove("show");
     }
   }
 
+  function hideOtherContainers() {
+    questionContainer.style.display = "block";
+    resultContainer.style.display = "block";
+    scoreElement.style.display = "block";
+    highscoreContainer.removeEventListener("transitionend", hideOtherContainers);
+  }
 });
