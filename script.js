@@ -1,14 +1,16 @@
+var nextButtonClickable = true; 
+
 document.addEventListener("DOMContentLoaded", function () {
   var questions = [
     {
       question: "Question 1: Which HTML tag is used to define an unordered list?",
       choices: ["<ul>", "<ol>", "<li>", "<div>"],
-      answer: 1,
+      answer: 0, 
     },
     {
       question: "Question 2: Which CSS property is used to change the color of text?",
       choices: ["font-size", "background-color", "color", "text-align"],
-      answer: 3,
+      answer: 2, 
     },
     {
       question: "Question 3: What is the correct syntax for creating a JavaScript function?",
@@ -18,17 +20,17 @@ document.addEventListener("DOMContentLoaded", function () {
         "myFunction() = function { }",
         "myFunction() { }",
       ],
-      answer: 2,
+      answer: 1, 
     },
     {
       question: "Question 4: Which JavaScript method is used to add an element to the end of an array?",
       choices: ["push()", "pop()", "shift()", "unshift()"],
-      answer: 1,
+      answer: 0, 
     },
     {
       question: "Question 5: Which CSS property is used to change the color of text?",
       choices: ["DOM API", "Fetch API", "Storage API", "Animation API"],
-      answer: 2,
+      answer: 2, 
     },
   ];
 
@@ -45,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var feedbackElement = document.getElementById("feedback");
   var questionContainer = document.getElementById("question-container");
   var highscoreContainer = document.getElementById("highscore-container");
-  var nextButtonClickable = true; // Move this line outside the DOMContentLoaded event listener
   var quizActive = false;
 
   var nextButton = document.createElement("button");
@@ -59,55 +60,66 @@ document.addEventListener("DOMContentLoaded", function () {
     resultContainer.style.display = "none";
   }
 
-  function showQuestion() {
-    var currentQuestion = questions[currentQuestionIndex];
-    answerSelected = false;
+  var userSelectedIndex;
 
-    if (!currentQuestion || !questionElement || !choicesElement || !feedbackElement) {
-      console.error("Error: Could not find one or more necessary elements.");
-      return;
-    }
+function showQuestion() {
+  var currentQuestion = questions[currentQuestionIndex];
+  answerSelected = false;
 
-    choicesElement.innerHTML = "";
-    questionElement.textContent = currentQuestion.question;
-
-    currentQuestion.choices.forEach(function (choice, index) {
-      var li = document.createElement("li");
-      li.textContent = choice;
-
-      var onClick = function () {
-        if (!answerSelected) {
-          answerSelected = true;
-          checkAnswer(index);
-          showNextButton();
-        }
-      };
-
-      li.addEventListener("click", onClick);
-      choicesElement.appendChild(li);
-    });
-
-    questionContainer.style.display = "block";
+  if (!currentQuestion || !questionElement || !choicesElement || !feedbackElement) {
+    console.error("Error: Could not find one or more necessary elements.");
+    return;
   }
 
-  function checkAnswer(choiceIndex) {
-    if (!answerSelected) {
-      answerSelected = true;
-      var currentQuestion = questions[currentQuestionIndex];
-      if (choiceIndex === currentQuestion.answer) {
-        feedbackElement.textContent = "Correct!";
-        score++;
-      } else {
-        feedbackElement.textContent = "Incorrect!";
-        timeLeft -= 10;
+  choicesElement.innerHTML = "";
+  questionElement.textContent = currentQuestion.question;
+
+  currentQuestion.choices.forEach(function (choice, index) {
+    var li = document.createElement("li");
+    li.textContent = choice;
+
+    var onClick = function () {
+      if (!answerSelected) {
+        answerSelected = true;
+        userSelectedIndex = index; // Store the user's selected index
+        checkAnswer(userSelectedIndex);
+        showNextButton();
       }
-      feedbackElement.style.display = "block";
-      setTimeout(function () {
-        hideResultContainer();
-        showNextQuestion();
-      }, 1000);
+    };
+
+    li.addEventListener("click", onClick);
+    choicesElement.appendChild(li);
+  });
+
+  questionContainer.style.display = "block";
+}
+
+// TODO: create a function to grab the users selected index. pass the function
+
+
+// TODO: display answer with a function choice=correct answer your text content will be correct. get valubel and display
+
+function checkAnswer(choiceIndex) {
+  if (!answerSelected) {
+    answerSelected = true;
+    var currentQuestion = questions[currentQuestionIndex];
+
+    if (choiceIndex === currentQuestion.answer) {
+      feedbackElement.textContent = "Correct!";
+      score++; // Increment the score for correct answers
+    } else {
+      feedbackElement.textContent = "Incorrect!";
+      timeLeft -= 10;
     }
+
+    feedbackElement.style.display = "block";
+    setTimeout(function () {
+      hideResultContainer();
+      showNextQuestion();
+    }, 1000);
   }
+}
+
 
   function showNextButton() {
     nextButton.style.display = "block";
@@ -116,34 +128,36 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function showNextQuestion() {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-      showQuestion();
-    } else {
-      showScore();
-    }
-  }
-  
-  function showScore() {
-    stopTimer();
-    scoreElement.textContent = "Your score: " + score + "/" + questions.length;
-    resultContainer.style.display = "block";
+function showNextQuestion() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < questions.length) {
+    showQuestion();
+  } else {
+    questionContainer.style.display = "none";
+    showScore();
+    // Add the following line
     displayHighScores();
   }
+}
+  
+function showFinalScore() {
+  stopTimer();
+  console.log("Final Score: " + score); // Add this line for debugging
+  scoreElement.textContent = "Your score: " + score + "/" + questions.length;
+  resultContainer.style.display = "block";
+  displayHighScores(); // Call displayHighScores here to show high scores when the final score is displayed
+}
 
-  function onNextButtonClick() {
-    nextButton.style.display = "none";
-    feedbackElement.style.display = "none";
-    nextButtonClickable = false;
-    showNextQuestion();
+function onNextButtonClick() {
+  nextButton.style.display = "none";
+  feedbackElement.style.display = "none";
+  nextButtonClickable = false;
+  showNextQuestion();
+  if (currentQuestionIndex === questions.length) {
+    // If all questions are answered, display the final score
+    showScore();
   }
-
-  function hideNextButton() {
-    nextButton.style.display = "none";
-    nextButtonClickable = true;
-    nextButton.removeEventListener("click", onNextButtonClick);
-  }
+}
 
   var startButton = document.getElementById("start-btn");
   startButton.addEventListener("click", startQuiz);
@@ -168,58 +182,66 @@ document.addEventListener("DOMContentLoaded", function () {
     clearInterval(timerInterval);
   }
 
-  function showScore() {
-    stopTimer();
-    scoreElement.textContent = "Your score: " + score + "/" + questions.length;
-    resultContainer.style.display = "block";
-    displayHighScores();
-  }
+function showScore() {
+  stopTimer();
+  console.log("Score: " + score); // Add this line for debugging
+  resultContainer.style.display = "block";
+  scoreElement.textContent = "Your score: " + score + "/" + questions.length;
 
+  // Add this line to display high scores
+  displayHighScores();
+}
   var restartButton = document.getElementById("restart-btn");
   restartButton.addEventListener("click", restartQuiz);
 
   var submitButton = document.getElementById("submit-button");
   var initialsInput = document.getElementById("initials-input");
 
-  submitButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    var initials = initialsInput.value;
-    var scoreData = {
-      initials: initials,
-      score: score,
-    };
+ submitButton.addEventListener("click", function (event) {
+  event.preventDefault();
+  var initials = initialsInput.value;
+  var scoreData = {
+    initials: initials,
+    score: score,
+  };
 
-    var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
-    highscores.push(scoreData);
-    localStorage.setItem("highscores", JSON.stringify(highscores));
-    displayHighScores();
+  var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
+  highscores.push(scoreData);
+  localStorage.setItem("highscores", JSON.stringify(highscores));
+
+  displayHighScores();
+});
+
+function displayHighScores() {
+  console.log("Before displayHighScores");
+  var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
+  var highscoreList = document.getElementById("highscore-list");
+
+  highscoreList.innerHTML = "";
+  highscores.sort(function (a, b) {
+    return b.score - a.score;
   });
 
-  function displayHighScores() {
-    var highscores = JSON.parse(localStorage.getItem("highscores")) || [];
-    var highscoreList = document.getElementById("highscore-list");
+  highscores.forEach(function (highscore, index) {
+    var li = document.createElement("li");
+    li.textContent = highscore.initials + ": " + highscore.score;
 
-    highscoreList.innerHTML = "";
-    highscores.sort(function (a, b) {
-      return b.score - a.score;
+    var removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", function () {
+      removeHighScore(index);
     });
 
-    highscores.forEach(function (highscore, index) {
-      var li = document.createElement("li");
-      li.textContent = highscore.initials + ": " + highscore.score;
+    li.appendChild(removeButton);
+    highscoreList.appendChild(li);
+  });
 
-      var removeButton = document.createElement("button");
-      removeButton.textContent = "Remove";
-      removeButton.addEventListener("click", function () {
-        removeHighScore(index);
-      });
+  initialsInput.value = "";
 
-      li.appendChild(removeButton);
-      highscoreList.appendChild(li);
-    });
-
-    initialsInput.value = "";
-  }
+  // Ensure that the highscoreContainer is shown
+  highscoreContainer.style.display = "block";
+  console.log("After displayHighScores, highscoreContainer visibility: ", highscoreContainer.style.display);
+}
 
   function removeHighScore(index) {
     var highscores = JSON.parse(localStorage.getItem("highscores")) || [];

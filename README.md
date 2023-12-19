@@ -26,7 +26,7 @@ THEN I can save my initials and score
 
 ## Mock-Up
 The following image shows the web application's appearance and functionality:
-![The Password Generator application displays a red button to "Generate Password".](./03-javascript-homework-demo.png)
+![The Coding Quiz displays a blue 'start' quiz button".](./quizscreenshot.png)
 
 ## Installation
 

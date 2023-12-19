@@ -56,7 +56,7 @@ header {
   margin-bottom: 10px;
 }
 
-.result-container {
+#result-container {
   display: none;
   margin-bottom: 20px;
 }
